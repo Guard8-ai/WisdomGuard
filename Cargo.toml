@@ -1,0 +1,38 @@
+[package]
+name = "wisdomguard"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.80"
+description = "Enhance agentic AI guides with VertexAI Gemini insights"
+license = "MIT"
+
+[dependencies]
+clap = { version = "4", features = ["derive"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+thiserror = "2"
+anyhow = "1"
+regex = "1"
+tokio = { version = "1", features = ["rt-multi-thread", "macros"] }
+reqwest = { version = "0.12", features = ["json", "rustls-tls"], default-features = false }
+gcp_auth = "0.12"
+
+[dev-dependencies]
+tempfile = "3"
+
+[profile.release]
+lto = true
+codegen-units = 1
+strip = true
+
+[lints.clippy]
+pedantic = { level = "deny", priority = -1 }
+all = { level = "deny", priority = -1 }
+missing_errors_doc = "allow"
+missing_panics_doc = "allow"
+module_name_repetitions = "allow"
+
+[lints.rust]
+dead_code = "deny"
+unused_variables = "deny"
+unsafe_code = "forbid"

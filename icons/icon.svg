@@ -1,0 +1,23 @@
+<svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="gradient-wisdomguard" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4A90D9"/>
+      <stop offset="100%" stop-color="#7C3AED"/>
+    </linearGradient>
+  </defs>
+  <path d="M 150 70 H 362 C 400 70, 422 100, 422 140 V 350 L 256 440 L 90 350 V 140 C 90 100, 112 70, 150 70 Z"
+        fill="#1A1A2E" stroke="url(#gradient-wisdomguard)" stroke-width="10" stroke-linejoin="round"/>
+  <g fill="none" stroke="#00D4AA" stroke-width="8" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Lightbulb -->
+    <path d="M 256 180 C 220 180 195 210 195 245 C 195 270 210 290 230 300 L 230 330 L 282 330 L 282 300 C 302 290 317 270 317 245 C 317 210 292 180 256 180 Z"/>
+    <!-- Filament -->
+    <line x1="240" y1="330" x2="272" y2="330"/>
+    <line x1="240" y1="342" x2="272" y2="342"/>
+    <!-- Light rays -->
+    <line x1="256" y1="155" x2="256" y2="170"/>
+    <line x1="175" y1="220" x2="185" y2="228"/>
+    <line x1="337" y1="220" x2="327" y2="228"/>
+    <line x1="185" y1="280" x2="175" y2="290"/>
+    <line x1="327" y1="280" x2="337" y2="290"/>
+  </g>
+</svg>
