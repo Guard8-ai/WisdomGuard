@@ -27,9 +27,9 @@ impl VertexConfig {
         let project_id = project
             .map(String::from)
             .or_else(|| std::env::var("GOOGLE_CLOUD_PROJECT").ok())
-            .ok_or_else(|| anyhow::anyhow!(
-                "Missing project ID. Set --project or GOOGLE_CLOUD_PROJECT env var"
-            ))?;
+            .ok_or_else(|| {
+                anyhow::anyhow!("Missing project ID. Set --project or GOOGLE_CLOUD_PROJECT env var")
+            })?;
 
         let location = location
             .map(String::from)
@@ -120,8 +120,9 @@ impl VertexClient {
             .build()
             .context("Failed to build HTTP client")?;
 
-        let auth = gcp_auth::provider().await
-            .context("Failed to initialize GCP authentication. Check GOOGLE_APPLICATION_CREDENTIALS")?;
+        let auth = gcp_auth::provider().await.context(
+            "Failed to initialize GCP authentication. Check GOOGLE_APPLICATION_CREDENTIALS",
+        )?;
 
         Ok(Self { config, http, auth })
     }
@@ -145,7 +146,11 @@ impl VertexClient {
                     }
 
                     let delay = Duration::from_secs(1 << attempt);
-                    eprintln!("Retrying in {}s (attempt {}/{max_retries})...", delay.as_secs(), attempt + 1);
+                    eprintln!(
+                        "Retrying in {}s (attempt {}/{max_retries})...",
+                        delay.as_secs(),
+                        attempt + 1
+                    );
                     tokio::time::sleep(delay).await;
                     last_error = Some(e);
                 }
@@ -156,14 +161,18 @@ impl VertexClient {
     }
 
     async fn try_generate(&self, prompt: &str) -> Result<String> {
-        let token = self.auth
-            .token(&["https://www.googleapis.com/auth/cloud-platform"]).await
+        let token = self
+            .auth
+            .token(&["https://www.googleapis.com/auth/cloud-platform"])
+            .await
             .context("Failed to get auth token")?;
 
         let request = GenerateRequest {
             contents: vec![Content {
                 role: "user".to_string(),
-                parts: vec![Part { text: prompt.to_string() }],
+                parts: vec![Part {
+                    text: prompt.to_string(),
+                }],
             }],
             generation_config: GenerationConfig {
                 max_output_tokens: self.config.max_tokens,
@@ -172,7 +181,8 @@ impl VertexClient {
         };
 
         let url = self.config.endpoint_url();
-        let response = self.http
+        let response = self
+            .http
             .post(&url)
             .bearer_auth(token.as_str())
             .json(&request)
@@ -194,7 +204,9 @@ impl VertexClient {
             anyhow::bail!("VertexAI request failed ({})", status.as_u16());
         }
 
-        let body: GenerateResponse = response.json().await
+        let body: GenerateResponse = response
+            .json()
+            .await
             .context("Failed to parse VertexAI response")?;
 
         body.candidates

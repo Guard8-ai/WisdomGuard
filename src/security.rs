@@ -24,7 +24,8 @@ pub fn load_file_safe(path: &Path) -> Result<String> {
     if is_symlink(path) {
         anyhow::bail!("Input file must not be a symbolic link");
     }
-    let mut file = std::fs::File::open(path).map_err(|e| anyhow::anyhow!("Cannot open file: {e}"))?;
+    let mut file =
+        std::fs::File::open(path).map_err(|e| anyhow::anyhow!("Cannot open file: {e}"))?;
     let metadata = file.metadata()?;
     if metadata.len() > MAX_IR_SIZE {
         anyhow::bail!("File exceeds maximum size of {MAX_IR_SIZE} bytes");
@@ -52,7 +53,9 @@ pub fn write_output_safe(path: &Path, content: &str) -> Result<()> {
             if is_symlink(parent) {
                 anyhow::bail!("Output parent directory must not be a symbolic link");
             }
-            let canonical_parent = parent.canonicalize().map_err(|e| anyhow::anyhow!("Cannot resolve output directory: {e}"))?;
+            let canonical_parent = parent
+                .canonicalize()
+                .map_err(|e| anyhow::anyhow!("Cannot resolve output directory: {e}"))?;
             canonical_parent.join(path.file_name().unwrap_or_default())
         }
     } else {
@@ -68,7 +71,10 @@ pub fn write_output_safe(path: &Path, content: &str) -> Result<()> {
     }
 
     let mut file = std::fs::OpenOptions::new()
-        .write(true).create(true).truncate(true).open(&resolved)?;
+        .write(true)
+        .create(true)
+        .truncate(true)
+        .open(&resolved)?;
     file.write_all(content.as_bytes())?;
 
     #[cfg(unix)]
@@ -81,15 +87,24 @@ pub fn write_output_safe(path: &Path, content: &str) -> Result<()> {
 
 #[must_use]
 pub fn escape_markdown(s: &str) -> String {
-    s.replace('|', "\\|").replace('\n', " ").replace('\r', "").replace('`', "'")
+    s.replace('|', "\\|")
+        .replace('\n', " ")
+        .replace('\r', "")
+        .replace('`', "'")
 }
 
 #[must_use]
 pub fn safe_description(desc: &str, max_len: usize) -> String {
     let escaped = escape_markdown(desc);
-    if escaped.len() <= max_len { return escaped; }
+    if escaped.len() <= max_len {
+        return escaped;
+    }
     let truncate_at = max_len.saturating_sub(3);
-    let boundary = escaped.char_indices().take_while(|(i, _)| *i <= truncate_at).last().map_or(0, |(i, _)| i);
+    let boundary = escaped
+        .char_indices()
+        .take_while(|(i, _)| *i <= truncate_at)
+        .last()
+        .map_or(0, |(i, _)| i);
     format!("{}...", &escaped[..boundary])
 }
 
@@ -123,7 +138,10 @@ mod tests {
 
     #[test]
     fn sanitizes_html_in_llm() {
-        assert_eq!(sanitize_llm_response("hello <script>alert</script> world"), "hello alert world");
+        assert_eq!(
+            sanitize_llm_response("hello <script>alert</script> world"),
+            "hello alert world"
+        );
         assert_eq!(sanitize_llm_response("<b>bold</b>"), "bold");
     }
 

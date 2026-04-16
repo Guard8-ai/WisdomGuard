@@ -84,7 +84,10 @@ pub fn build_enhancement_prompt(req: &EnhancementRequest) -> String {
     ENHANCEMENT_PROMPT
         .replace("{TOOL_NAME}", &req.tool_name)
         .replace("{IR_JSON}", &req.ir_json)
-        .replace("tool specification", &format!("{} tool specification", req.guide_type))
+        .replace(
+            "tool specification",
+            &format!("{} tool specification", req.guide_type),
+        )
 }
 
 /// Parse the LLM response into an `EnhancementResponse`.
@@ -96,10 +99,7 @@ pub fn parse_enhancement_response(response: &str) -> Result<EnhancementResponse>
         .strip_prefix("```json")
         .or_else(|| response.trim().strip_prefix("```"))
         .unwrap_or(response.trim());
-    let cleaned = cleaned
-        .strip_suffix("```")
-        .unwrap_or(cleaned)
-        .trim();
+    let cleaned = cleaned.strip_suffix("```").unwrap_or(cleaned).trim();
 
     serde_json::from_str(cleaned).or_else(|_| {
         eprintln!("Warning: Could not parse LLM response as JSON, using empty enhancements");

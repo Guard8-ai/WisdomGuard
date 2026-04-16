@@ -1,5 +1,8 @@
 use crate::prompt::{self, EnhancementRequest, EnhancementResponse};
-use crate::security::{escape_markdown, safe_description, sanitize_llm_response, MAX_DESCRIPTION_LENGTH, MAX_LLM_RESPONSE_SIZE};
+use crate::security::{
+    escape_markdown, safe_description, sanitize_llm_response, MAX_DESCRIPTION_LENGTH,
+    MAX_LLM_RESPONSE_SIZE,
+};
 use crate::vertex::VertexClient;
 use anyhow::Result;
 use std::fmt::Write;
@@ -72,7 +75,11 @@ fn merge_sections(base: &str, enhancements: &EnhancementResponse) -> String {
     let mut inserted_mistakes = false;
 
     for line in base.lines() {
-        if !inserted_workflows && line.starts_with("## ") && !line.contains("Quick Reference") && !enhancements.workflows.is_empty() {
+        if !inserted_workflows
+            && line.starts_with("## ")
+            && !line.contains("Quick Reference")
+            && !enhancements.workflows.is_empty()
+        {
             result.push_str(&format_workflows(enhancements));
             inserted_workflows = true;
         }
@@ -90,7 +97,9 @@ fn merge_sections(base: &str, enhancements: &EnhancementResponse) -> String {
     if !inserted_workflows && !enhancements.workflows.is_empty() {
         result.push_str(&format_workflows(enhancements));
     }
-    if !inserted_mistakes && (!enhancements.gotchas.is_empty() || !enhancements.error_solutions.is_empty()) {
+    if !inserted_mistakes
+        && (!enhancements.gotchas.is_empty() || !enhancements.error_solutions.is_empty())
+    {
         result.push_str(&format_gotchas(enhancements));
         result.push_str(&format_errors(enhancements));
     }
@@ -101,7 +110,11 @@ fn merge_sections(base: &str, enhancements: &EnhancementResponse) -> String {
 fn format_enhanced_guide(tool_name: &str, enhancements: &EnhancementResponse) -> String {
     let mut out = String::with_capacity(4096);
 
-    let _ = writeln!(out, "# {} for AI Agents — Enhanced Guide", escape_markdown(tool_name));
+    let _ = writeln!(
+        out,
+        "# {} for AI Agents — Enhanced Guide",
+        escape_markdown(tool_name)
+    );
     let _ = writeln!(out);
 
     if !enhancements.key_items.is_empty() {
@@ -131,7 +144,11 @@ fn format_workflows(enhancements: &EnhancementResponse) -> String {
     let _ = writeln!(out, "## Common Workflows");
     let _ = writeln!(out);
     for wf in &enhancements.workflows {
-        let _ = writeln!(out, "### {}", safe_description(&wf.title, MAX_DESCRIPTION_LENGTH));
+        let _ = writeln!(
+            out,
+            "### {}",
+            safe_description(&wf.title, MAX_DESCRIPTION_LENGTH)
+        );
         let _ = writeln!(out);
         let _ = writeln!(out, "```bash");
         for step in &wf.steps {
@@ -154,7 +171,8 @@ fn format_gotchas(enhancements: &EnhancementResponse) -> String {
     let _ = writeln!(out, "|-------|-------|-----|");
     for g in &enhancements.gotchas {
         let _ = writeln!(
-            out, "| {} | {} | {} |",
+            out,
+            "| {} | {} | {} |",
             safe_description(&g.wrong, MAX_DESCRIPTION_LENGTH),
             safe_description(&g.right, MAX_DESCRIPTION_LENGTH),
             safe_description(&g.explanation, MAX_DESCRIPTION_LENGTH),
@@ -175,7 +193,8 @@ fn format_errors(enhancements: &EnhancementResponse) -> String {
     let _ = writeln!(out, "|-------|----------|");
     for es in &enhancements.error_solutions {
         let _ = writeln!(
-            out, "| {} | {} |",
+            out,
+            "| {} | {} |",
             safe_description(&es.error, MAX_DESCRIPTION_LENGTH),
             safe_description(&es.solution, MAX_DESCRIPTION_LENGTH),
         );

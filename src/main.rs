@@ -9,7 +9,11 @@ use std::path::PathBuf;
 use std::process::ExitCode;
 
 #[derive(Parser)]
-#[command(name = "wisdomguard", version, about = "Enhance agentic AI guides with VertexAI Gemini insights")]
+#[command(
+    name = "wisdomguard",
+    version,
+    about = "Enhance agentic AI guides with VertexAI Gemini insights"
+)]
 struct Cli {
     /// Path to the IR JSON file (from cliguard, apiguard, or docguard --output-format json)
     ir_file: PathBuf,
@@ -57,7 +61,10 @@ fn main() -> ExitCode {
             if msg.contains("Authentication") || msg.contains("credentials") {
                 eprintln!("Error: {msg}");
                 ExitCode::from(3)
-            } else if msg.contains("Cannot open") || msg.contains("symbolic link") || msg.contains("traversal") {
+            } else if msg.contains("Cannot open")
+                || msg.contains("symbolic link")
+                || msg.contains("traversal")
+            {
                 eprintln!("Error: {msg}");
                 ExitCode::from(2)
             } else {
@@ -72,11 +79,10 @@ fn main() -> ExitCode {
 async fn run() -> Result<()> {
     let cli = Cli::parse();
 
-    let ir_json = security::load_file_safe(&cli.ir_file)
-        .context("Could not load IR file")?;
+    let ir_json = security::load_file_safe(&cli.ir_file).context("Could not load IR file")?;
 
-    let _: serde_json::Value = serde_json::from_str(&ir_json)
-        .context("IR file is not valid JSON")?;
+    let _: serde_json::Value =
+        serde_json::from_str(&ir_json).context("IR file is not valid JSON")?;
 
     if cli.dry_run {
         let prompt_text = enhancer::dry_run_prompt(&ir_json);
@@ -100,8 +106,8 @@ async fn run() -> Result<()> {
             .context("Failed to serialize enhancements")?,
         OutputFormat::Md => {
             if let Some(ref base_path) = cli.base_guide {
-                let base = security::load_file_safe(base_path)
-                    .context("Could not load base guide")?;
+                let base =
+                    security::load_file_safe(base_path).context("Could not load base guide")?;
                 enhancer::merge_enhancements_into(&base, &enhancements)
             } else {
                 enhancer::format_standalone(&ir_json, &enhancements)
@@ -110,8 +116,7 @@ async fn run() -> Result<()> {
     };
 
     if let Some(ref path) = cli.output {
-        security::write_output_safe(path, &output)
-            .context("Failed to write output file")?;
+        security::write_output_safe(path, &output).context("Failed to write output file")?;
         eprintln!("Enhanced guide written to output file");
     } else {
         print!("{output}");
