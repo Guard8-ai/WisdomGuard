@@ -16,8 +16,7 @@ fn blocked_prefixes() -> Vec<PathBuf> {
 
 fn is_symlink(path: &Path) -> bool {
     path.symlink_metadata()
-        .map(|m| m.file_type().is_symlink())
-        .unwrap_or(false)
+        .is_ok_and(|m| m.file_type().is_symlink())
 }
 
 pub fn load_file_safe(path: &Path) -> Result<String> {
